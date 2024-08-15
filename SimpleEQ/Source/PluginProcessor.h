@@ -53,6 +53,19 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    /* Audio plugins depend on parameters to control the various parts of the DSP.
+     * JUCE uses an object called the AudioProcessorValueTreeState to co-ordinate
+     * sync these parameters with the knobs on the GUI and the variables in the DSP.
+     * Therefore, we need them in our audio processor that needs to be public so that
+     * the GUI can attach all of its knobs, sliders, etc -- apvts --
+     */
+
+    /* *this is the AudioProcessor to connect to, nullptr for no undo manager
+     */
+    static juce::AudioProcessorValueTreeState::ParameterLayout
+        createParameterLayout();
+    juce::AudioProcessorValueTreeState apvts{ *this, nullptr, "Parameters", createParameterLayout() };
+     
 private:
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SimpleEQAudioProcessor)
