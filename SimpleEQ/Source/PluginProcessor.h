@@ -67,6 +67,37 @@ public:
     juce::AudioProcessorValueTreeState apvts{ *this, nullptr, "Parameters", createParameterLayout() };
      
 private:
+
+    // creation of filter alias
+    using Filter = juce::dsp::IIR::Filter<float>;
+  
+    /* have set the slopes of our cut filters to be multiples of 12
+     * each of the filter types in the IIR filter class has a response of
+     * 12 dB per octave when it is configures as a low pass or high pass filter.
+     * If we want to have a chain with a response of 48 dB per octave we are going to need
+     * 4 of those filters.
+     * A central concept of the DSP namespace in JUCE framework is to define a chain and pass in a
+     * processing context which will run through each element of the chain automatically
+     */
+
+    using CutFilter = juce::dsp::ProcessorChain<Filter, Filter, Filter, Filter>;
+
+    /* We can use one filter to represent the parametric filter so now that we have
+     * the cut filter and the peak filter represented as aliases we can define a chain
+     * to represent the whole mono signal path
+     */
+
+    using MonoChain = juce::dsp::ProcessorChain<CutFilter, Filter, CutFilter>;
+
+    /* we want two instances of the mono chain to do stereo processing
+     * and to have access to the filter instances in order to adjust their cutoff gain,
+     * quality or slope
+     */
+
+     // Declare the DSP chains for the left and right channels
+    juce::dsp::ProcessorChain<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Filter<float>> leftChain;
+    juce::dsp::ProcessorChain<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Filter<float>> rightChain;
+
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SimpleEQAudioProcessor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SimpleEQAudioProcessor)
 };

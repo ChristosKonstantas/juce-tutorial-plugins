@@ -95,6 +95,22 @@ void SimpleEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
+
+    /* Here we prepare our filters before we use them and we do this by passing
+     * a process spec object to the chains which will then pass it to each link in the chain.
+     * Here we need the maximum number of samples that we will process at one time
+     */
+
+    juce::dsp::ProcessSpec spec;
+    spec.maximumBlockSize= samplesPerBlock;
+    spec.numChannels = 1;
+    spec.sampleRate = sampleRate;
+
+    leftChain.prepare(spec);
+    rightChain.prepare(spec);
+
+
+
 }
 
 void SimpleEQAudioProcessor::releaseResources()
@@ -131,6 +147,13 @@ bool SimpleEQAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts)
 
 void SimpleEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
+    /* Processor chain requires a processing context to be passed to it in order to run
+     * the audio through the links in the chain. In order to make a processing context, we need to supply it
+     * with an audio block instance. Now the processBlock() function is called by the host and it is given
+     * a buffer which can have any number of channels, so we need to extract the left channel and the right
+     * channel from this buffer. L(0) R(1).
+     */
+
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
@@ -144,18 +167,33 @@ void SimpleEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
+    juce::dsp::AudioBlock<float>block(buffer);
+
+
     // This is the place where you'd normally do the guts of your plugin's
     // audio processing...
     // Make sure to reset the state if your inner loop is processing
     // the samples and the outer loop is handling the channels.
     // Alternatively, you can process the samples with the channels
     // interleaved by keeping the same state.
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
+    /*
+     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
         auto* channelData = buffer.getWritePointer (channel);
 
         // ..do something to the data...
     }
+    */
+
+    auto leftBlock = block.getSingleChannelBlock(0);
+    auto rightBlock = block.getSingleChannelBlock(1);
+
+    juce::dsp::ProcessContextReplacing<float> leftContext(leftBlock);
+    juce::dsp::ProcessContextReplacing<float> rightContext(rightBlock);
+
+    leftChain.process(leftContext);
+    rightChain.process(rightContext);
+
 }
 
 //==============================================================================
@@ -207,7 +245,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout
     {
         juce::String str;
         str << (12 + i * 12);
-        str << " dB/OCt";
+        str << " dB/Oct";
         stringArray.add(str);
     }
 
