@@ -27,3 +27,6 @@ A simple hello world window using JUCE following [PFM Starting From Scratch](htt
 
 ### SimpleEQ
 A simple equalizer plugin (in progress).
+
+### WavetableSynth
+A simple wavetable synthesizer from [WolfSound](https://thewolfsound.com/sound-synthesis/wavetable-synth-plugin-in-juce/).
