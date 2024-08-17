@@ -13,7 +13,9 @@
     2.2. For Linux execute
    
    `cd /path/to/juce-framework/extras/Projucer/Builds/LinuxMakefile/`
+   
    `make`
+   
    `./build/Projucer`
    
 5. Open with [Projucer](https://docs.juce.com/master/tutorial_new_projucer_project.html), project.jucer file. Save and open with Visual Studio Code version that you use.
@@ -23,5 +25,5 @@
 ### HelloWorldWin
 A simple hello world window using JUCE following [PFM Starting From Scratch](https://www.youtube.com/watch?v=JHTcLVOcnQ4&t=0s).
 
-### simpleEQ
+### SimpleEQ
 A simple equalizer plugin (in progress).
