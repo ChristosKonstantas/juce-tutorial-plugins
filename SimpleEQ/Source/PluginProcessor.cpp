@@ -97,14 +97,17 @@ void SimpleEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
     // initialisation that you need..
 
     /* Here we prepare our filters before we use them and we do this by passing
-     * a process spec object to the chains which will then pass it to each link in the chain.
-     * Here we need the maximum number of samples that we will process at one time
+     * a ProcessSpec object to the chains which will then pass it to each link in the chain.
+     * Here we need the maximum number of samples that we will process at one time,
+     * the number of channels and sampleRate.
      */
 
     juce::dsp::ProcessSpec spec;
     spec.maximumBlockSize= samplesPerBlock;
     spec.numChannels = 1;
     spec.sampleRate = sampleRate;
+
+    /* We can pass ProcessSpec type spec to each chain and will be prepared and ready for processing */
 
     leftChain.prepare(spec);
     rightChain.prepare(spec);
@@ -166,8 +169,8 @@ void SimpleEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     // this code if your algorithm always overwrites all the output channels.
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
-
-    juce::dsp::AudioBlock<float>block(buffer);
+    /* First thing we have to do is to create an AudioBlock initialized with our buffer */
+    juce::dsp::AudioBlock<float> block(buffer);
 
 
     // This is the place where you'd normally do the guts of your plugin's
@@ -185,12 +188,19 @@ void SimpleEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     }
     */
 
+    /* Now we can use the helper function in the AudioBlock class to extract individual channels from the buffer
+     * which will then be wrapped inside more audio blocks.
+     */
+
     auto leftBlock = block.getSingleChannelBlock(0);
     auto rightBlock = block.getSingleChannelBlock(1);
 
+    /* Now that we have audio blocks representing each individual channel we can create processing contexts
+     * that wrap each individual audio block for the channels.
+     */
     juce::dsp::ProcessContextReplacing<float> leftContext(leftBlock);
     juce::dsp::ProcessContextReplacing<float> rightContext(rightBlock);
-
+    /* Now we can pass the above contexts to our mono filter chains */
     leftChain.process(leftContext);
     rightChain.process(rightContext);
 
@@ -206,7 +216,8 @@ juce::AudioProcessorEditor* SimpleEQAudioProcessor::createEditor()
 {
     //return new SimpleEQAudioProcessorEditor (*this);
 
-    /* we can use the generic audio processor to see what our parameters look like
+    /*
+     * we can use the generic audio processor to see what our parameters look like
      */
     return new juce::GenericAudioProcessorEditor(*this);
 }
@@ -228,8 +239,23 @@ void SimpleEQAudioProcessor::setStateInformation (const void* data, int sizeInBy
 juce::AudioProcessorValueTreeState::ParameterLayout
 	SimpleEQAudioProcessor::createParameterLayout()
 {
+    /*
+     * For this project we will keep the DSP and GUI simple:
+     * 3 equalizer bands: low cut, high cut and peak
+     * For low cut and high cut we'll be able to control freq cutoff and slope cutoff
+     * For peak and parametric band we'll be able to control the center frequency, the gain
+     * and the quality, i.e., how narrow or how wide the peak is
+     */
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
 
+    /* AudioParameterFloat type is used to represent parameters displayed on the GUI with sliders.
+     * An optional skew factor that alters the way values are distributed across the range is assigned below.
+     * The skew factor lets us skew the mapping logarithmically s.t. larger or smaller values are given a
+     * larger proportion of the available space. A factor of 1.0 has no skewing effect at all.
+     * If the skew factor is < 1.0, the lower end of the range will fill more of the slider's length.
+     * If the skew factor is > 1.0 the upper end of the range will be expanded.
+     * For no skewing => skew factor = 1 (linear response)
+    */
     layout.add(std::make_unique<juce::AudioParameterFloat>("LowCut Freq", "LowCut Freq", juce::NormalisableRange<float>(20.f, 20000.f, 1.f, 1.f), 20.f));
 
     layout.add(std::make_unique<juce::AudioParameterFloat>("HighCut Freq", "HighCut Freq", juce::NormalisableRange<float>(20.f, 20000.f, 1.f, 1.f), 20000.f));
@@ -238,7 +264,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout
 
     layout.add(std::make_unique<juce::AudioParameterFloat>("Peak Gain", "Peak Gain", juce::NormalisableRange<float>(-24.f, 24.f, 0.5f, 1.f),0.0f));
 
-    layout.add(std::make_unique<juce::AudioParameterFloat>("Quality", "Quality", juce::NormalisableRange<float>(0.1f, 10.f, 0.05f, 1.f), 1.f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("Peak Quality", "Peak Quality", juce::NormalisableRange<float>(0.1f, 10.f, 0.05f, 1.f), 1.f));
 
     juce::StringArray stringArray;
     for (int i=0; i<4; ++i)
@@ -249,8 +275,16 @@ juce::AudioProcessorValueTreeState::ParameterLayout
         stringArray.add(str);
     }
 
+    /* We need to create the AudioParameterChoice and give it the stringArray of choices using the
+     * default value of 0, i.e. default slope of 12 dB/Oct.
+     */
+
     layout.add(std::make_unique<juce::AudioParameterChoice>("LowCut Slope", "LowCut Slope", stringArray, 0));
     layout.add(std::make_unique<juce::AudioParameterChoice>("HighCut Slope", "HighCut Slope", stringArray, 0));
+
+    /* We have setup the parameters in our parameter layout so we can just return it and pass it to the
+     * AudioProcessorValueTreeState constructor which we have already done.
+     */
 
     return layout;
 }
