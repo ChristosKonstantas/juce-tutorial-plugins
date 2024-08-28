@@ -121,8 +121,81 @@ void SimpleEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
     auto peakCoefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter(sampleRate, chainSettings.peakFreq,
         chainSettings.peakQuality, juce::Decibels::decibelsToGain(chainSettings.peakGainInDecibels));
 
-    leftChain.get<ChainPositions::Peak>().coefficients = *peakCoefficients;
-    rightChain.get<ChainPositions::Peak>().coefficients = *peakCoefficients;
+    *leftChain.get<ChainPositions::Peak>().coefficients = *peakCoefficients;
+    *rightChain.get<ChainPositions::Peak>().coefficients = *peakCoefficients;
+
+    auto cutCoefficients = juce::dsp::FilterDesign<float>::designIIRHighpassHighOrderButterworthMethod(chainSettings.lowCutFreq, sampleRate,2 * (chainSettings.lowCutSlope + 1));
+
+    auto& leftLowCut = leftChain.get<ChainPositions::LowCut>();
+
+    leftLowCut.reset();
+
+    switch (chainSettings.lowCutSlope)
+    {
+	    case Slope_12:
+	    {
+	        *leftLowCut.coefficients = *cutCoefficients[0];
+	        // The filter is now active, bypass is effectively "stopped" by applying coefficients
+	        break;
+	    }
+	    case Slope_24:
+	    {
+	        *leftLowCut.coefficients = *cutCoefficients[0];
+	        *leftLowCut.coefficients = *cutCoefficients[1]; // Additional coefficients for higher slope
+	        break;
+	    }
+	    case Slope_36:
+	    {
+	        *leftLowCut.coefficients = *cutCoefficients[0];
+	        *leftLowCut.coefficients = *cutCoefficients[1];
+	        *leftLowCut.coefficients = *cutCoefficients[2]; // Additional coefficients for higher slope
+	        break;
+	    }
+	    case Slope_48:
+	    {
+	        *leftLowCut.coefficients = *cutCoefficients[0];
+	        *leftLowCut.coefficients = *cutCoefficients[1];
+	        *leftLowCut.coefficients = *cutCoefficients[2];
+	        *leftLowCut.coefficients = *cutCoefficients[3]; // Additional coefficients for the highest slope
+	        break;
+	    }
+    }
+
+    auto& rightLowCut = rightChain.get<ChainPositions::LowCut>();
+
+    rightLowCut.reset();
+
+    switch (chainSettings.lowCutSlope)
+    {
+	    case Slope_12:
+	    {
+	        *rightLowCut.coefficients = *cutCoefficients[0];
+	        // The filter is now active, bypass is effectively "stopped" by applying coefficients
+	        break;
+	    }
+	    case Slope_24:
+	    {
+	        *rightLowCut.coefficients = *cutCoefficients[0];
+	        *rightLowCut.coefficients = *cutCoefficients[1]; // Additional coefficients for higher slope
+	        break;
+	    }
+	    case Slope_36:
+	    {
+	        *rightLowCut.coefficients = *cutCoefficients[0];
+	        *rightLowCut.coefficients = *cutCoefficients[1];
+	        *rightLowCut.coefficients = *cutCoefficients[2]; // Additional coefficients for higher slope
+	        break;
+	    }
+	    case Slope_48:
+	    {
+	        *rightLowCut.coefficients = *cutCoefficients[0];
+	        *rightLowCut.coefficients = *cutCoefficients[1];
+	        *rightLowCut.coefficients = *cutCoefficients[2];
+	        *rightLowCut.coefficients = *cutCoefficients[3]; // Additional coefficients for the highest slope
+	        break;
+	    }
+    }
+
 }
 
 void SimpleEQAudioProcessor::releaseResources()
@@ -184,8 +257,86 @@ void SimpleEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     auto peakCoefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter(getSampleRate(), chainSettings.peakFreq,
         chainSettings.peakQuality, juce::Decibels::decibelsToGain(chainSettings.peakGainInDecibels));
 
-    leftChain.get<ChainPositions::Peak>().coefficients = *peakCoefficients;
-    rightChain.get<ChainPositions::Peak>().coefficients = *peakCoefficients;
+    *leftChain.get<ChainPositions::Peak>().coefficients = *peakCoefficients;
+	*rightChain.get<ChainPositions::Peak>().coefficients = *peakCoefficients;
+
+
+
+
+    auto cutCoefficients = juce::dsp::FilterDesign<float>::designIIRHighpassHighOrderButterworthMethod(chainSettings.lowCutFreq, getSampleRate(), 2 * (chainSettings.lowCutSlope + 1));
+
+    auto& leftLowCut = leftChain.get<ChainPositions::LowCut>();
+
+    leftLowCut.reset();
+
+    switch (chainSettings.lowCutSlope)
+    {
+    case Slope_12:
+    {
+        *leftLowCut.coefficients = *cutCoefficients[0];
+        // The filter is now active, bypass is effectively "stopped" by applying coefficients
+        break;
+    }
+    case Slope_24:
+    {
+        *leftLowCut.coefficients = *cutCoefficients[0];
+        *leftLowCut.coefficients = *cutCoefficients[1]; // Additional coefficients for higher slope
+        break;
+    }
+    case Slope_36:
+    {
+        *leftLowCut.coefficients = *cutCoefficients[0];
+        *leftLowCut.coefficients = *cutCoefficients[1];
+        *leftLowCut.coefficients = *cutCoefficients[2]; // Additional coefficients for higher slope
+        break;
+    }
+    case Slope_48:
+    {
+        *leftLowCut.coefficients = *cutCoefficients[0];
+        *leftLowCut.coefficients = *cutCoefficients[1];
+        *leftLowCut.coefficients = *cutCoefficients[2];
+        *leftLowCut.coefficients = *cutCoefficients[3]; // Additional coefficients for the highest slope
+        break;
+    }
+    }
+
+    auto& rightLowCut = rightChain.get<ChainPositions::LowCut>();
+
+    rightLowCut.reset();
+
+    switch (chainSettings.lowCutSlope)
+    {
+    case Slope_12:
+    {
+        *rightLowCut.coefficients = *cutCoefficients[0];
+        // The filter is now active, bypass is effectively "stopped" by applying coefficients
+        break;
+    }
+    case Slope_24:
+    {
+        *rightLowCut.coefficients = *cutCoefficients[0];
+        *rightLowCut.coefficients = *cutCoefficients[1]; // Additional coefficients for higher slope
+        break;
+    }
+    case Slope_36:
+    {
+        *rightLowCut.coefficients = *cutCoefficients[0];
+        *rightLowCut.coefficients = *cutCoefficients[1];
+        *rightLowCut.coefficients = *cutCoefficients[2]; // Additional coefficients for higher slope
+        break;
+    }
+    case Slope_48:
+    {
+        *rightLowCut.coefficients = *cutCoefficients[0];
+        *rightLowCut.coefficients = *cutCoefficients[1];
+        *rightLowCut.coefficients = *cutCoefficients[2];
+        *rightLowCut.coefficients = *cutCoefficients[3]; // Additional coefficients for the highest slope
+        break;
+    }
+    }
+
+
+
 
 
     /* First thing we have to do is to create an AudioBlock initialized with our buffer */
@@ -268,8 +419,8 @@ ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts)
     settings.peakFreq = apvts.getRawParameterValue("Peak Freq")->load();
     settings.peakGainInDecibels = apvts.getRawParameterValue("Peak Gain")->load();
     settings.peakQuality = apvts.getRawParameterValue("Peak Quality")->load();
-    settings.lowCutSlope = apvts.getRawParameterValue("LowCut Slope")->load();
-    settings.highCutSlope = apvts.getRawParameterValue("HighCut Slope")->load();
+    settings.lowCutSlope = static_cast<Slope>(apvts.getRawParameterValue("LowCut Slope")->load());
+    settings.highCutSlope = static_cast<Slope>(apvts.getRawParameterValue("HighCut Slope")->load());
 
 	return settings;
 }

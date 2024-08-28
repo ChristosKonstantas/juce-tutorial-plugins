@@ -10,6 +10,16 @@
 
 #include <JuceHeader.h>
 
+enum Slope
+{
+	Slope_12,
+    Slope_24,
+    Slope_36,
+    Slope_48
+};
+
+
+
 /* We want to extract our parameters from the AudioProcessorValueTreeState.
  * A data structure representing all of the parameter values will keep our code readable
  */
@@ -18,7 +28,7 @@ struct ChainSettings
 {
     float peakFreq{ 0 }, peakGainInDecibels{ 0 }, peakQuality{ 1.f };
     float lowCutFreq{ 0 }, highCutFreq{ 0 };
-    int lowCutSlope{ 0 }, highCutSlope{ 0 };
+    Slope lowCutSlope{Slope::Slope_12 }, highCutSlope{ Slope::Slope_12};
 };
 
 /* A helper function that will give us all of these parameter values in our data structure */
