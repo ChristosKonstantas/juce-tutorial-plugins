@@ -9,7 +9,7 @@
 #pragma once
 
 #include <JuceHeader.h>
-
+#include <juce_dsp/juce_dsp.h>
 enum Slope
 {
 	Slope_12,
@@ -107,22 +107,19 @@ private:
      */
 
     using CutFilter = juce::dsp::ProcessorChain<Filter, Filter, Filter, Filter>;
-
     /* We can use one filter to represent the parametric filter so now that we have
      * the cut filter and the peak filter represented as aliases we can define a chain
      * to represent the whole mono signal path
      */
 
     using MonoChain = juce::dsp::ProcessorChain<CutFilter, Filter, CutFilter>;
-
+    MonoChain leftChain;
+    MonoChain rightChain;
     /* we want two instances of the mono chain to do stereo processing
      * and to have access to the filter instances in order to adjust their cutoff gain,
      * quality or slope.
      */
 
-     // Declare the DSP chains for the left and right channels
-    juce::dsp::ProcessorChain<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Filter<float>> leftChain;
-    juce::dsp::ProcessorChain<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Filter<float>> rightChain;
 
     enum ChainPositions
     {
@@ -130,6 +127,65 @@ private:
         Peak,
         HighCut
     };
+
+    void updatePeakFilter(const ChainSettings& chainSettings);
+    using Coefficients = Filter::CoefficientsPtr;
+    static void updateCoefficients(Coefficients& old, const Coefficients& replacements);
+
+    template<typename ChainType, typename CoefficientContainerType>
+    void updateCutFilter(ChainType& lowCut,
+        const CoefficientContainerType& cutCoefficients,
+        const Slope& lowCutSlope)
+    {
+        // Reset all filters to bypassed state
+        lowCut.template setBypassed<0>(true);
+        lowCut.template setBypassed<1>(true);
+        lowCut.template setBypassed<2>(true);
+        lowCut.template setBypassed<3>(true);
+
+        // Enable the required number of filters based on the selected slope
+        switch (lowCutSlope)
+        {
+        case Slope_12:
+        {
+            *lowCut.template get<0>().coefficients = *cutCoefficients[0];
+            lowCut.template setBypassed<0>(false);
+            break;
+        }
+        case Slope_24:
+        {
+            *lowCut.template get<0>().coefficients = *cutCoefficients[0];
+            lowCut.template setBypassed<0>(false);
+            *lowCut.template get<1>().coefficients = *cutCoefficients[1];
+            lowCut.template setBypassed<1>(false);
+            break;
+        }
+        case Slope_36:
+        {
+            *lowCut.template get<0>().coefficients = *cutCoefficients[0];
+            lowCut.template setBypassed<0>(false);
+            *lowCut.template get<1>().coefficients = *cutCoefficients[1];
+            lowCut.template setBypassed<1>(false);
+            *lowCut.template get<2>().coefficients = *cutCoefficients[2];
+            lowCut.template setBypassed<2>(false);
+            break;
+        }
+        case Slope_48:
+        {
+            *lowCut.template get<0>().coefficients = *cutCoefficients[0];
+            lowCut.template setBypassed<0>(false);
+            *lowCut.template get<1>().coefficients = *cutCoefficients[1];
+            lowCut.template setBypassed<1>(false);
+            *lowCut.template get<2>().coefficients = *cutCoefficients[2];
+            lowCut.template setBypassed<2>(false);
+            *lowCut.template get<3>().coefficients = *cutCoefficients[3];
+            lowCut.template setBypassed<3>(false);
+            break;
+        }
+        }
+    }
+
+
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SimpleEQAudioProcessor)
 };
