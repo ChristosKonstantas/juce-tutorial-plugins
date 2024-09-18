@@ -11,10 +11,24 @@
 
 //==============================================================================
 XY_PadAudioProcessorEditor::XY_PadAudioProcessorEditor (XY_PadAudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p)
+    : AudioProcessorEditor (&p),
+      audioProcessor (p),
+	  gainAttachment(p.getApvts(), "gain", gainSlider),
+      panAttachment(p.getApvts(), "pan", panSlider)
+
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
+    addAndMakeVisible(gainSlider);
+    addAndMakeVisible(panSlider);
+    addAndMakeVisible(gainLabel);
+    addAndMakeVisible(panLabel);
+
+    gainLabel.setJustificationType(juce::Justification::centred);
+    panLabel.setJustificationType(juce::Justification::centred);
+    gainLabel.attachToComponent(&gainSlider, false);
+    panLabel.attachToComponent(&panSlider, false);
+
     setSize (400, 300);
 }
 

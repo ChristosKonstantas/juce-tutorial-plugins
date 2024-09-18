@@ -178,6 +178,11 @@ void XY_PadAudioProcessor::setStateInformation (const void* data, int sizeInByte
     // whose contents will have been created by the getStateInformation() call.
 }
 
+juce::AudioProcessorValueTreeState& XY_PadAudioProcessor::getApvts()
+{
+    return parameters;
+}
+
 void XY_PadAudioProcessor::parameterChanged(const juce::String& parameterID, float newValue)
 {
 	// Over here if you pass two arguments: parameterID of the parameter that changed

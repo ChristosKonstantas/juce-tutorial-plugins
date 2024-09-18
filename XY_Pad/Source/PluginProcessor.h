@@ -57,6 +57,7 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    juce::AudioProcessorValueTreeState& getApvts();
 private:
     //==============================================================================
     // declare the parameters that will be available for this application in the apvts class
