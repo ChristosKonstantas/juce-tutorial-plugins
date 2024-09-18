@@ -34,3 +34,6 @@ A simple equalizer plugin (in progress).
 
 ### WavetableSynth
 A simple wavetable synthesizer from [WolfSound](https://thewolfsound.com/sound-synthesis/wavetable-synth-plugin-in-juce/).
+
+### XY_Pad
+A simple XY Pad with a draggable thumb, a gain slider for volume control, and a panner slider for stereo balance.
