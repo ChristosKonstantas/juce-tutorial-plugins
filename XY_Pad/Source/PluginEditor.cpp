@@ -30,12 +30,16 @@ XY_PadAudioProcessorEditor::XY_PadAudioProcessorEditor (XY_PadAudioProcessor& p)
     gainLabel.attachToComponent(&gainSlider, false);
     panLabel.attachToComponent(&panSlider, false);
 
+    xyPad.registerSlider(&gainSlider, Gui::XyPad::Axis::Y);
+    xyPad.registerSlider(&panSlider, Gui::XyPad::Axis::X);
     setSize (500, 300);
     setResizable(true, true); //allows to resize window
 }
 
 XY_PadAudioProcessorEditor::~XY_PadAudioProcessorEditor()
 {
+    xyPad.deregisterSlider(&gainSlider);
+    xyPad.deregisterSlider(&panSlider);
 }
 
 //==============================================================================

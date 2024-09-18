@@ -18,6 +18,7 @@ namespace Gui // for all Gui components
 			// mouse listener members
 			void mouseDown(const juce::MouseEvent& event) override;;
 			void mouseDrag(const juce::MouseEvent& event) override;
+			std::function<void(juce::Point<double>)> moveCallback;
 		private:
 			// ComponentDragger is a class that allows to drag this component withing its parent
 			juce::ComponentDragger dragger;
@@ -47,6 +48,7 @@ namespace Gui // for all Gui components
 		// A collection of registered sliders
 		std::vector<juce::Slider*> xSliders, ySliders;
 		Thumb thumb; // instance of Thumb Class within its parent
+		std::mutex vectorMutex;
 		// static constexpr int guarantees compile - time evaluation.
 		static constexpr int thumbSize = 40; 
 		// Below macro is good to have within custom juce component because if someone creates a
