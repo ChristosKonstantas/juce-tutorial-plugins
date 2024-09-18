@@ -65,7 +65,7 @@
           uiLastY_Normal="225" uiopen_Normal="0">
     <PLUGIN name="XY_Pad" format="VST3" category="Fx" manufacturer="kiztam"
             version="1.0.0" file="C:\Users\Mtzk\Desktop\vst\JUCE\juce-tutorial-plugins\XY_Pad\Builds\VisualStudio2022\x64\Debug\VST3\XY_Pad.vst3\Contents\x86_64-win\XY_Pad.vst3"
-            uniqueId="a0a717" isInstrument="0" fileTime="192046f48eb" infoUpdateTime="19204727570"
+            uniqueId="a0a717" isInstrument="0" fileTime="192046f48eb" infoUpdateTime="1920472c99f"
             numInputs="2" numOutputs="2" isShell="0" hasARAExtension="0"
             uid="e959d00b"/>
     <STATE>191.VMjLgXK....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOVMEUy.Ea0cVZtMEcgQWY9vSRC8Vav8lak4Fc9XCLt3hKt3hKt3hKt3hYRUUSTEETIckVwTjQisVTTgkdEYjKAQjYPQSPWgUdMcjKAQjct3hdA4hKt3hKt3hKtnTUv.UQAslXuk0UXoWUFE0YQcEV77RRC8Vav8lak4Fc9vyKVMEUy.Ea0cVZtMEcgQWY9..</STATE>
@@ -82,7 +82,7 @@
           uiLastY_Normal="200" uiopen_Normal="0">
     <PLUGIN name="AudioFilePlayer" format="VST3" category="Fx" manufacturer="Matkat Music LLC"
             version="1.0.0" file="C:\Program Files\Common Files\VST3\AudioFilePlayer.vst3\Contents\x86_64-win\AudioFilePlayer.vst3"
-            uniqueId="79fe81c" isInstrument="0" fileTime="19198d0edcf" infoUpdateTime="19204727571"
+            uniqueId="79fe81c" isInstrument="0" fileTime="19198d0edcf" infoUpdateTime="1920472c99f"
             numInputs="2" numOutputs="2" isShell="0" hasARAExtension="0"
             uid="e95d02c7"/>
     <STATE>271.VMjLgXP....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOVMEUy.Ea0cVZtMEcgQWY9vSRC8Vav8lak4Fc9DSL43BTIISX1UEaho2ZVkUdAAkKAwDUigWRWkEcQ0VTucmUY4BQ1cTQLolShUELhsVRxHlXvPzX0LmQWQTUwHVbQISX1cWQis1brsjLEw1Xt3hKt3hKt3hKt3hKt3FUUMTUDQEdqw1XmE0UYQTQFM1YAAkKAgDUjYWQwHVdAAkKAwjKtLlKt3hKt3hKt3hYRUUSTEETIckVwTjQisVTTgkdEYDOujzPu0Fbu4VYtQmO77hUSQ0LPwVcmklaSQWXzUlO..</STATE>
