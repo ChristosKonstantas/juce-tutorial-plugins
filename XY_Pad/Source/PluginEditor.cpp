@@ -23,13 +23,14 @@ XY_PadAudioProcessorEditor::XY_PadAudioProcessorEditor (XY_PadAudioProcessor& p)
     addAndMakeVisible(panSlider);
     addAndMakeVisible(gainLabel);
     addAndMakeVisible(panLabel);
+    addAndMakeVisible(xyPad);
 
     gainLabel.setJustificationType(juce::Justification::centred);
     panLabel.setJustificationType(juce::Justification::centred);
     gainLabel.attachToComponent(&gainSlider, false);
     panLabel.attachToComponent(&panSlider, false);
 
-    setSize (400, 300);
+    setSize (500, 300);
 }
 
 XY_PadAudioProcessorEditor::~XY_PadAudioProcessorEditor()
@@ -48,7 +49,12 @@ void XY_PadAudioProcessorEditor::resized()
 {
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
-    juce::Rectangle<int> bounds = getLocalBounds().reduced(20);
-    gainSlider.setBounds(bounds.removeFromLeft(bounds.proportionOfWidth(0.5f)));
+
+    const juce::Rectangle<int> container = getLocalBounds().reduced(20);
+
+
+    juce::Rectangle<int> bounds = container;
+    gainSlider.setBounds(bounds.removeFromLeft(container.proportionOfWidth(0.25f)));
+    xyPad.setBounds(bounds.removeFromLeft(container.proportionOfWidth(0.5)).reduced(20));
     panSlider.setBounds(bounds);
 }

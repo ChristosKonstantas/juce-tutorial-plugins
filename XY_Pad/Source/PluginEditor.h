@@ -10,7 +10,7 @@
 
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
-
+#include "Component/XyPad.h"
 //==============================================================================
 /**
 */
@@ -43,7 +43,7 @@ private:
 
     juce::Label gainLabel{ "gainLabel", "Gain" };
     juce::Label panLabel{ "panLabel", "Pan" };
-
+    Gui::XyPad xyPad;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (XY_PadAudioProcessorEditor)
 };

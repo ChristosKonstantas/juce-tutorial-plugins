@@ -4,6 +4,10 @@
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" companyName="kiztam">
   <MAINGROUP id="GLLFFB" name="XY_Pad">
     <GROUP id="{3ECEEB71-1BC8-69A8-025A-705AE332B197}" name="Source">
+      <GROUP id="{E3700914-3279-0002-2ACE-08E32DABFB2E}" name="Component">
+        <FILE id="v1k1Dd" name="XyPad.cpp" compile="1" resource="0" file="Source/Component/XyPad.cpp"/>
+        <FILE id="uUuLWt" name="XyPad.h" compile="0" resource="0" file="Source/Component/XyPad.h"/>
+      </GROUP>
       <FILE id="LPBehW" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="aUigKt" name="PluginProcessor.h" compile="0" resource="0"
