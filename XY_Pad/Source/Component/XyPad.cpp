@@ -65,6 +65,10 @@ namespace Gui
 	void XyPad::resized()
 	{
 		thumb.setBounds(getLocalBounds().withSizeKeepingCentre(thumbSize,thumbSize));
+		if (!xSliders.empty())
+			sliderValueChanged(xSliders[0]);
+		if (!ySliders.empty())
+			sliderValueChanged(ySliders[0]);
 	}
 
 	void XyPad::paint(juce::Graphics& g)
