@@ -31,6 +31,7 @@ XY_PadAudioProcessorEditor::XY_PadAudioProcessorEditor (XY_PadAudioProcessor& p)
     panLabel.attachToComponent(&panSlider, false);
 
     setSize (500, 300);
+    setResizable(true, true); //allows to resize window
 }
 
 XY_PadAudioProcessorEditor::~XY_PadAudioProcessorEditor()
@@ -54,6 +55,7 @@ void XY_PadAudioProcessorEditor::resized()
 
 
     juce::Rectangle<int> bounds = container;
+    // <--gainSlider--> 25% | <--XY Pad--> 50% | <--panSlider--> 25%
     gainSlider.setBounds(bounds.removeFromLeft(container.proportionOfWidth(0.25f)));
     xyPad.setBounds(bounds.removeFromLeft(container.proportionOfWidth(0.5)).reduced(20));
     panSlider.setBounds(bounds);
