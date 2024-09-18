@@ -5,7 +5,7 @@
 namespace Gui // for all Gui components
 {
 	/* Custom JUCE component XyPad*/
-	class XyPad : public juce::Component // this class inherits from juce::Component class
+	class XyPad : public juce::Component, juce::Slider::Listener
 	{
 	public:
 		
@@ -16,9 +16,9 @@ namespace Gui // for all Gui components
 			Thumb();
 			void paint(juce::Graphics& g) override;
 			// mouse listener members
-			void mouseDown(const juce::MouseEvent& event) override;;
+			void mouseDown(const juce::MouseEvent& event) override;
 			void mouseDrag(const juce::MouseEvent& event) override;
-			std::function<void(juce::Point<double>)> moveCallback;
+			std::function<void(juce::Point<double>)> moveCallback; //(*)
 		private:
 			// ComponentDragger is a class that allows to drag this component withing its parent
 			juce::ComponentDragger dragger;
@@ -45,6 +45,7 @@ namespace Gui // for all Gui components
 		void deregisterSlider(juce::Slider* slider);
 
 	private:
+		void sliderValueChanged(juce::Slider*) override;
 		// A collection of registered sliders
 		std::vector<juce::Slider*> xSliders, ySliders;
 		Thumb thumb; // instance of Thumb Class within its parent
@@ -57,3 +58,23 @@ namespace Gui // for all Gui components
 		JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(XyPad);
 	};
 }
+
+
+//(*):
+// xSlider and ySlider vectors are not present in the Thumb class, but they are present in the parent
+// class. The xSlider and ySlider vectors are present within the XyPad which the thumb does not
+// really have access to. The Thumb should not really be changing and manipulating the vectors
+// themselves because it's not really the responsibility of the thumb to change the slider values
+// that the parent maintains.
+// So we need some sort of Callback method that the parent can pass s.t. whenever the thumb is moved
+// the callback method is executed. This way the thumb does not need to know what happens it just
+// needs to know that there's a Callback that needs to be called, but it does not really need to
+// understand any technicalities of the Callback itself.
+// So: we can create a function pointer std::function<void(juce::Point<double>)> moveCallback;
+// and this function will return void, and it will accept a point. This point is the XY position
+// of the thumb itself. So the signature of the method that the Thumb class will accept is
+// a function which returns void and accepts a position parameter. The thumb is perfectly capable
+// of providing its own position; whoever passes this function pointer signature to this function
+// to move callback will utilize this point (this position) and do something with it.
+// We need to do use the moveCallback() whenever the mouse is dragged.
+// See (void XyPad::Thumb::mouseDrag(const juce::MouseEvent& event)) inside XyPad.cpp

@@ -41,12 +41,13 @@ namespace Gui
 
 	XyPad::XyPad()
 	{
+		//(*)
 		addAndMakeVisible(thumb);
 		thumb.moveCallback = [&](juce::Point<double> position)
 			{
 				const std::lock_guard<std::mutex> lock(std::mutex);
 				const auto bounds = getLocalBounds().toDouble();
-				const auto w = static_cast<double>(thumbSize);
+				const double w = static_cast<double>(thumbSize);
 				for (auto* slider : xSliders)
 				{
 					slider->setValue(juce::jmap(position.getX(), 0.0, bounds.getWidth() - w, slider->getMinimum(), slider->getMaximum()));
@@ -88,6 +89,7 @@ namespace Gui
 		// responsibility of the destructor to release any locks that it may have for the mutex.
 		// What we need to remember is that wherever we're going to access the x and y sliders
 		// we need to lock that method or at least lock that scope of usage.
+		slider->addListener(this);
 		const std::lock_guard<std::mutex> lock(vectorMutex);
 		if (axis == Axis::X)
 			xSliders.push_back(slider); // push the Slider pointer into the xSliders collection
@@ -100,6 +102,7 @@ namespace Gui
 	void XyPad::deregisterSlider(juce::Slider* slider)
 	{
 		/* Lock */
+		slider->removeListener(this);
 		const std::lock_guard<std::mutex> lock(vectorMutex);
 
 		/* remove/erase idiom*/
@@ -120,5 +123,46 @@ namespace Gui
 		// that slider it will remove all of the many duplicated registrations as well.
 	}
 
+	void XyPad::sliderValueChanged(juce::Slider* slider)
+	{
+		// Avoid Loopback
+		if (thumb.isMouseOverOrDragging(false))
+			return;
+
+		// Figure out if the slider belongs to xSliders or ySliders
+		const bool isXAxisSlider = std::find(xSliders.begin(), xSliders.end(), slider)
+		                                                                     != xSliders.end();
+		const juce::Rectangle<double> bounds = getLocalBounds().toDouble();
+		const auto w = static_cast<double>(thumbSize);
+		if(isXAxisSlider)
+		{
+			thumb.setTopLeftPosition(juce::jmap(slider->getValue(), slider->getMinimum(), slider->getMaximum(), 0.0, bounds.getWidth() - w), thumbSize);
+		} else
+		{
+			thumb.setTopLeftPosition(thumb.getX(),
+				juce::jmap(slider->getValue(), slider->getMinimum(), slider->getMaximum(), bounds.getHeight() - w, 0.0));
+		}
+		repaint();
+	}
+
+
 
 }
+
+//(*) --> See fist the (*) note on XyPad.h
+// In the XyPad (parent of the Thumb) we need to define what should happen when the thumb moves.
+// Thus we initialize
+// thumb.moveCallback() = [&](juce::Point<double> position)
+// {
+//   Here we are going to iterate through the list of sliders that we have with a range based
+//   for-loop iterating within each one of the slider within xSliders and ySliders and setValue
+//   for the slider itself. We'll also use the lock_guard because we are actually accessing the
+//   vectors here.
+//   What value do we need to set to the slider of xSlider?
+//		If the position of the thumb is on the far left we can treat this as the minimum slider value.
+//      If the thumb is on the far right then we can treat this as the maximum slider value possible.
+//    same for ySliders.
+//	  jmap() maps the x position that we get from a value of 0 (leftmost position) to a value of the
+//    width of the xy pad. The top-left position of the thumb ^| | all way to the right would be the
+//    entire width minus the size of the thumb (thumbSize) => bounds.getWidth() - thumbSize
+// }
